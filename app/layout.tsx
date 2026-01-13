@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <Header />
-          {children}
+          <div className="pt-14">{children}</div>
         </ReactQueryProvider>
       </body>
     </html>

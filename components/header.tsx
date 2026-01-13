@@ -19,7 +19,7 @@ export default function Header() {
   }, [isAuthenticated, isLoading, fetchSession]);
   const isUserLoggedIn = isAuthenticated;
   return (
-    <header className="flex w-full items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 dark:bg-black dark:border-zinc-800">
+    <header className="fixed left-0 right-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-zinc-200 bg-white/80 px-6 backdrop-blur supports--webkit-backdrop-filter:bg-white/70 dark:bg-black/60 dark:border-zinc-800">
       <Link href="/" className="text-lg font-semibold">
         AI Content
       </Link>
