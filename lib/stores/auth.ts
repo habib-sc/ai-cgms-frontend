@@ -74,5 +74,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   // Client-only logout (clear state). Add server logout later.
-  clear: () => set({ user: null, isAuthenticated: false }),
+  clear: () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("accessToken");
+      window.localStorage.removeItem("refreshToken");
+    }
+    set({ user: null, isAuthenticated: false });
+  },
 }));
