@@ -33,6 +33,13 @@ async function unwrap<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
   return res.data;
 }
 
+async function unwrapData<T>(
+  p: Promise<AxiosResponse<ApiResponse<T>>>
+): Promise<T> {
+  const res = await p;
+  return res.data.data;
+}
+
 // Minimal types (expand later)
 export interface User {
   id: string;
@@ -87,19 +94,20 @@ export const api = {
       contentType: string;
       model?: string;
       provider?: Provider;
-    }) => unwrap<{ jobId: string }>(http.post("/v1/content/generate", body)),
+    }) =>
+      unwrapData<{ jobId: string }>(http.post("/v1/content/generate", body)),
     // POST /v1/content/:contentId/regenerate (optional provider/model)
     regenerate: (
       contentId: string,
       body?: { provider?: Provider; model?: string }
     ) =>
-      unwrap<{ jobId: string }>(
+      unwrapData<{ jobId: string }>(
         http.post(`/v1/content/${contentId}/regenerate`, body ?? {})
       ),
     status: (jobId: string) =>
-      unwrap<JobStatus>(http.get(`/v1/content/${jobId}/status`)),
+      unwrapData<JobStatus>(http.get(`/v1/content/${jobId}/status`)),
     get: (contentId: string) =>
-      unwrap<Content>(http.get(`/v1/content/${contentId}`)),
+      unwrapData<Content>(http.get(`/v1/content/${contentId}`)),
     // GET /v1/content: page, limit, status, contentType, startDate, endDate, search
     list: (params?: {
       page?: number;
@@ -119,14 +127,14 @@ export const api = {
       if (params?.endDate) qs.set("endDate", params.endDate);
       if (params?.search) qs.set("search", params.search);
       const suffix = qs.toString() ? `?${qs.toString()}` : "";
-      return unwrap<Content[]>(http.get(`/v1/content${suffix}`));
+      return unwrapData<Content[]>(http.get(`/v1/content${suffix}`));
     },
     // PATCH /v1/content/:contentId (title, tags, notes)
     patch: (
       contentId: string,
       body: { title?: string; tags?: string[]; notes?: string }
-    ) => unwrap<Content>(http.patch(`/v1/content/${contentId}`, body)),
+    ) => unwrapData<Content>(http.patch(`/v1/content/${contentId}`, body)),
     delete: (contentId: string) =>
-      unwrap<void>(http.delete(`/v1/content/${contentId}`)),
+      unwrapData<void>(http.delete(`/v1/content/${contentId}`)),
   },
 };
