@@ -1,18 +1,31 @@
-// API client (frontend). Reads NEXT_PUBLIC_API_BASE_URL from .env.
-// Uses credentials: "include" for cookie-based sessions.
+import axios, { type AxiosResponse, type AxiosRequestHeaders } from "axios";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:5000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
-async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(init.headers ?? {}) },
-    credentials: "include",
-  });
-  if (!res.ok)
-    throw new Error(await res.text().catch(() => `HTTP ${res.status}`));
-  return res.json() as Promise<T>;
+export const http = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+  timeout: 15000,
+});
+
+http.interceptors.request.use((config) => {
+  const method = (config.method ?? "get").toLowerCase();
+  const nextHeaders: Record<string, string> = {
+    Accept: "application/json",
+    ...(method === "get" || method === "head"
+      ? {}
+      : { "Content-Type": "application/json" }),
+  };
+  config.headers = {
+    ...(config.headers as AxiosRequestHeaders),
+    ...nextHeaders,
+  } as AxiosRequestHeaders;
+  return config;
+});
+
+async function unwrap<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
+  const res = await p;
+  return res.data;
 }
 
 // Minimal types (expand later)
@@ -45,16 +58,10 @@ export type Provider = "gemini" | "openai";
 export const api = {
   auth: {
     register: (body: { name: string; email: string; password: string }) =>
-      apiFetch<User>("/v1/auth/register", {
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
+      unwrap<User>(http.post("/v1/auth/register", body)),
     login: (body: { email: string; password: string }) =>
-      apiFetch<User>("/v1/auth/login", {
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
-    me: () => apiFetch<{ user: User | null }>("/v1/auth/me"),
+      unwrap<User>(http.post("/v1/auth/login", body)),
+    me: () => unwrap<{ user: User | null }>(http.get("/v1/auth/me")),
   },
   content: {
     // POST /v1/content/generate (expects prompt + contentType)
@@ -63,23 +70,19 @@ export const api = {
       contentType: string;
       model?: string;
       provider?: Provider;
-    }) =>
-      apiFetch<{ jobId: string }>("/v1/content/generate", {
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
+    }) => unwrap<{ jobId: string }>(http.post("/v1/content/generate", body)),
     // POST /v1/content/:contentId/regenerate (optional provider/model)
     regenerate: (
       contentId: string,
       body?: { provider?: Provider; model?: string }
     ) =>
-      apiFetch<{ jobId: string }>(`/v1/content/${contentId}/regenerate`, {
-        method: "POST",
-        body: JSON.stringify(body ?? {}),
-      }),
+      unwrap<{ jobId: string }>(
+        http.post(`/v1/content/${contentId}/regenerate`, body ?? {})
+      ),
     status: (jobId: string) =>
-      apiFetch<JobStatus>(`/v1/content/${jobId}/status`),
-    get: (contentId: string) => apiFetch<Content>(`/v1/content/${contentId}`),
+      unwrap<JobStatus>(http.get(`/v1/content/${jobId}/status`)),
+    get: (contentId: string) =>
+      unwrap<Content>(http.get(`/v1/content/${contentId}`)),
     // GET /v1/content: page, limit, status, contentType, startDate, endDate, search
     list: (params?: {
       page?: number;
@@ -99,18 +102,14 @@ export const api = {
       if (params?.endDate) qs.set("endDate", params.endDate);
       if (params?.search) qs.set("search", params.search);
       const suffix = qs.toString() ? `?${qs.toString()}` : "";
-      return apiFetch<Content[]>(`/v1/content${suffix}`);
+      return unwrap<Content[]>(http.get(`/v1/content${suffix}`));
     },
     // PATCH /v1/content/:contentId (title, tags, notes)
     patch: (
       contentId: string,
       body: { title?: string; tags?: string[]; notes?: string }
-    ) =>
-      apiFetch<Content>(`/v1/content/${contentId}`, {
-        method: "PATCH",
-        body: JSON.stringify(body),
-      }),
+    ) => unwrap<Content>(http.patch(`/v1/content/${contentId}`, body)),
     delete: (contentId: string) =>
-      apiFetch<void>(`/v1/content/${contentId}`, { method: "DELETE" }),
+      unwrap<void>(http.delete(`/v1/content/${contentId}`)),
   },
 };
