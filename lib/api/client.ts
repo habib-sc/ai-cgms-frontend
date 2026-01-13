@@ -4,7 +4,6 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
 export const http = axios.create({
   baseURL: API_BASE,
-  withCredentials: true,
   timeout: 15000,
 });
 
@@ -16,6 +15,12 @@ http.interceptors.request.use((config) => {
       ? {}
       : { "Content-Type": "application/json" }),
   };
+  if (typeof window !== "undefined") {
+    const token =
+      window.localStorage.getItem("accessToken") ||
+      window.localStorage.getItem("access_token");
+    if (token) nextHeaders.Authorization = `Bearer ${token}`;
+  }
   config.headers = {
     ...(config.headers as AxiosRequestHeaders),
     ...nextHeaders,
@@ -55,12 +60,24 @@ export interface JobStatus {
 
 export type Provider = "gemini" | "openai";
 
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
+}
+
+export interface AuthData {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
 export const api = {
   auth: {
     register: (body: { name: string; email: string; password: string }) =>
-      unwrap<User>(http.post("/v1/auth/register", body)),
+      unwrap<ApiResponse<AuthData>>(http.post("/v1/auth/register", body)),
     login: (body: { email: string; password: string }) =>
-      unwrap<User>(http.post("/v1/auth/login", body)),
+      unwrap<ApiResponse<AuthData>>(http.post("/v1/auth/login", body)),
     me: () => unwrap<{ user: User | null }>(http.get("/v1/auth/me")),
   },
   content: {

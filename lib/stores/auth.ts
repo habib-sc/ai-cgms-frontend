@@ -2,7 +2,7 @@
 // Zustand auth store: session mirror + login/register.
 
 import { create } from "zustand";
-import { api, User } from "../api/client";
+import { api, type User, type ApiResponse, type AuthData } from "../api/client";
 
 interface AuthState {
   user: User | null;
@@ -37,7 +37,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: undefined });
     try {
-      const user = await api.auth.login({ email, password });
+      const resp = await api.auth.login({ email, password });
+      const data = (resp as ApiResponse<AuthData>).data;
+      const user = data.user;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("accessToken", data.accessToken);
+        window.localStorage.setItem("refreshToken", data.refreshToken);
+        window.localStorage.removeItem("access_token");
+        window.localStorage.removeItem("refresh_token");
+      }
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Login error";
@@ -49,7 +57,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (name, email, password) => {
     set({ isLoading: true, error: undefined });
     try {
-      const user = await api.auth.register({ name, email, password });
+      const resp = await api.auth.register({ name, email, password });
+      const data = (resp as ApiResponse<AuthData>).data;
+      const user = data.user;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("accessToken", data.accessToken);
+        window.localStorage.setItem("refreshToken", data.refreshToken);
+        window.localStorage.removeItem("access_token");
+        window.localStorage.removeItem("refresh_token");
+      }
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Register error";
