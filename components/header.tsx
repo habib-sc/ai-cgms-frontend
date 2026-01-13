@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useAuthStore } from "../lib/stores/auth";
 import { UserCircle, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { isAuthenticated, user, clear, fetchSession, isLoading } =
     useAuthStore();
+  const router = useRouter();
   useEffect(() => {
     const tokenPresent =
       typeof window !== "undefined" &&
@@ -47,7 +49,10 @@ export default function Header() {
             </Link>
             <button
               type="button"
-              onClick={clear}
+              onClick={() => {
+                clear();
+                router.replace("/login");
+              }}
               className="inline-flex items-center gap-2 text-sm text-red-600 hover:underline dark:text-red-400"
             >
               <LogOut className="h-4 w-4" />
