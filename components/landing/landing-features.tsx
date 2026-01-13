@@ -1,8 +1,8 @@
 "use client";
-import * as React from "react";
+import type { ReactNode } from "react";
 
 export interface LandingFeature {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   desc: string;
 }
@@ -12,7 +12,10 @@ export interface LandingFeaturesProps {
   className?: string;
 }
 
-export function LandingFeatures({ features, className = "" }: LandingFeaturesProps) {
+export function LandingFeatures({
+  features,
+  className = "",
+}: LandingFeaturesProps) {
   return (
     <div className={`mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3 ${className}`}>
       {features.map((f) => (
@@ -24,7 +27,9 @@ export function LandingFeatures({ features, className = "" }: LandingFeaturesPro
             {f.icon}
             <span className="text-sm font-medium">{f.title}</span>
           </div>
-          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{f.desc}</p>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            {f.desc}
+          </p>
         </div>
       ))}
     </div>

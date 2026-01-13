@@ -1,13 +1,10 @@
 "use client";
-// Standard input with focus ring.
+import { forwardRef } from "react";
+import type { InputHTMLAttributes } from "react";
 
-import * as React from "react";
+type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
-// Use a type alias to avoid empty interface lint error.
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
-
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  function Input({ className = "", ...props }, ref) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className = "", ...props }, ref) {
     return (
       <input
         ref={ref}
@@ -15,5 +12,4 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
       />
     );
-  }
-);
+});

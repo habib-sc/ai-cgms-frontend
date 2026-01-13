@@ -1,14 +1,14 @@
 "use client";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import * as React from "react";
+import type { ReactNode } from "react";
 
 export interface LandingHeroProps {
   title: string;
   subtitle: string;
   primary: { href: string; label: string };
   secondary?: { href: string; label: string };
-  badge?: React.ReactNode;
+  badge?: ReactNode;
   className?: string;
 }
 

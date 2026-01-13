@@ -1,10 +1,7 @@
 "use client";
-// Accessible label.
+import type { LabelHTMLAttributes } from "react";
 
-import * as React from "react";
-
-// Use a type alias to avoid empty interface lint error.
-type LabelProps = React.LabelHTMLAttributes<HTMLLabelElement>;
+type LabelProps = LabelHTMLAttributes<HTMLLabelElement>;
 
 export function Label({ className = "", ...props }: LabelProps) {
   return (

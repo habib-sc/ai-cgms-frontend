@@ -1,12 +1,10 @@
 "use client";
-// Multi-line text area.
+import { forwardRef } from "react";
+import type { TextareaHTMLAttributes } from "react";
 
-import * as React from "react";
+type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 
-// Use a type alias to avoid empty interface lint error.
-type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
-
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea({ className = "", ...props }, ref) {
     return (
       <textarea

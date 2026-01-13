@@ -1,7 +1,13 @@
 "use client";
-// Shadcn-style dropdown (trigger + menu + selected check). No Radix dependency.
-
-import * as React from "react";
+import {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  Children,
+  isValidElement,
+} from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
 export function Select({
@@ -10,23 +16,23 @@ export function Select({
   defaultValue,
   name,
   onChange,
-}: React.PropsWithChildren<{
+}: PropsWithChildren<{
   className?: string;
   defaultValue?: string;
   name?: string;
   onChange?: (e: { target: { value: string } }) => void;
 }>) {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<string | undefined>(defaultValue);
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | undefined>(defaultValue);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const options = React.useMemo(() => {
-    return React.Children.toArray(children)
+  const options = useMemo(() => {
+    return Children.toArray(children)
       .map((child) => {
-        if (!React.isValidElement(child)) return null;
+        if (!isValidElement(child)) return null;
         const props = child.props as {
           value: string;
-          children?: React.ReactNode;
+          children?: ReactNode;
         };
         const v = props.value;
         const label = String(props.children ?? "");
@@ -37,7 +43,7 @@ export function Select({
 
   const selected = options.find((o) => o.value === value) || options[0];
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
       if (!containerRef.current) return;
       if (!containerRef.current.contains(e.target as Node)) setOpen(false);
