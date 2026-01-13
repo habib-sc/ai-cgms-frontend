@@ -6,6 +6,7 @@ import { Input } from "../../../components/ui/input";
 import { Select } from "../../../components/ui/select";
 import { CONTENT_TYPES } from "../../../lib/constants/content-types";
 import Link from "next/link";
+import { formatDateTime } from "../../../lib/utils/datetime";
 
 export default function MyContentPage() {
   const [search, setSearch] = useState("");
@@ -57,9 +58,9 @@ export default function MyContentPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((c) => (
-            <Card key={c.id}>
-              <div className="flex items-start justify-between">
+          {items.map((c, index) => (
+            <Card key={c.id ?? c._id ?? `${c.title}-${c.createdAt}-${index}`}>
+              <div className="flex items.start justify-between">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">
                     {c.title || "Untitled"}
@@ -69,12 +70,12 @@ export default function MyContentPage() {
                   </div>
                 </div>
                 <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {new Date(c.createdAt).toLocaleDateString()}
+                  {formatDateTime(c.createdAt)}
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between">
                 <Link
-                  href={`/dashboard/content/${c.id}`}
+                  href={`/dashboard/content/${c.id ?? c._id}`}
                   className="text-xs text-blue-600 hover:underline dark:text-blue-400"
                 >
                   View

@@ -2,6 +2,7 @@
 import type { Content } from "../../lib/api/client";
 import { Card } from "../ui/card";
 import Link from "next/link";
+import { formatDateTime } from "../../lib/utils/datetime";
 
 export function RecentContent({
   items,
@@ -30,9 +31,9 @@ export function RecentContent({
             No content yet
           </div>
         ) : (
-          list.map((c) => (
+          list.map((c, index) => (
             <div
-              key={c.id}
+              key={c.id ?? c._id ?? `${c.title}-${c.createdAt}-${index}`}
               className="flex items-center justify-between rounded-md px-2 py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900"
             >
               <div className="min-w-0">
@@ -44,7 +45,7 @@ export function RecentContent({
                 </div>
               </div>
               <div className="text-xs text-zinc-500 dark:text-zinc-400">
-                {new Date(c.createdAt).toLocaleDateString()}
+                {formatDateTime(c.createdAt)}
               </div>
             </div>
           ))

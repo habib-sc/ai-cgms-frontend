@@ -59,6 +59,7 @@ export interface User {
 }
 export interface Content {
   id: string;
+  _id?: string;
   userId: string;
   contentType: string; // align with backend naming
   title: string;

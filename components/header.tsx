@@ -17,10 +17,7 @@ export default function Header() {
       !!window.localStorage.getItem("accessToken");
     if (tokenPresent && !isAuthenticated && !isLoading) fetchSession();
   }, [isAuthenticated, isLoading, fetchSession]);
-  const isUserLoggedIn =
-    isAuthenticated ||
-    (typeof window !== "undefined" &&
-      !!window.localStorage.getItem("accessToken"));
+  const isUserLoggedIn = isAuthenticated;
   return (
     <header className="flex w-full items-center justify-between border-b border-zinc-200 bg-white px-6 py-3 dark:bg-black dark:border-zinc-800">
       <Link href="/" className="text-lg font-semibold">
