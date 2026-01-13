@@ -1,11 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Button } from "../../components/ui/button";
 import { useAuthStore } from "../../lib/stores/auth";
+import { Eye, EyeOff } from "lucide-react";
 
 export interface AuthFormProps {
   mode: "login" | "register";
@@ -17,6 +18,7 @@ type Values = { name?: string; email: string; password: string };
 export function AuthForm({ mode, className = "" }: AuthFormProps) {
   const router = useRouter();
   const { isAuthenticated, isLoading, error, login, register } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register: formRegister,
     handleSubmit,
@@ -83,12 +85,26 @@ export function AuthForm({ mode, className = "" }: AuthFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="••••••"
-          {...formRegister("password", { required: true, minLength: 6 })}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••"
+            {...formRegister("password", { required: true, minLength: 6 })}
+          />
+          <button
+            type="button"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            onClick={() => setShowPassword((v) => !v)}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <span className="text-xs text-red-600">Min 6 characters</span>
         )}
