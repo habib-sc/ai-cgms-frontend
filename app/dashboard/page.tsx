@@ -9,6 +9,14 @@ import { Sparkles, FileText, BarChart3 } from "lucide-react";
 export default function DashboardPage() {
   const { data, isLoading } = useContentList({ limit: 50 });
   const total = data?.length ?? 0;
+  const recent = useMemo(() => {
+    const arr = [...(data ?? [])];
+    arr.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    return arr;
+  }, [data]);
   const byType = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of CONTENT_TYPES) map.set(t.id, 0);
@@ -41,7 +49,7 @@ export default function DashboardPage() {
         />
       </div>
 
-      <RecentContent items={data ?? []} />
+      <RecentContent items={recent} limit={8} />
     </div>
   );
 }

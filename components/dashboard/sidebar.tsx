@@ -13,7 +13,9 @@ const items = [
 export function Sidebar({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   return (
-    <aside className={`flex h-full w-64 flex-col border-r border-zinc-200 bg-white/80 backdrop-blur dark:bg-black/60 dark:border-zinc-800 ${className}`}>
+    <aside
+      className={`flex h-full w-64 flex-col border-r border-zinc-200 bg-white/80 backdrop-blur dark:bg-black/60 dark:border-zinc-800 ${className}`}
+    >
       <div className="px-4 py-3">
         <div className="text-sm font-semibold">Dashboard</div>
       </div>
@@ -39,4 +41,3 @@ export function Sidebar({ className = "" }: { className?: string }) {
     </aside>
   );
 }
-
