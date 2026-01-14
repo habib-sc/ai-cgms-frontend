@@ -13,7 +13,7 @@ export function ContentCard({
   content: Content;
   typeLabel: string;
 }) {
-  const status: "pending" | "completed" | "failed" =
+  const status: "pending" | "processing" | "queued" | "completed" | "failed" =
     content.status ??
     (content.contentError
       ? "failed"

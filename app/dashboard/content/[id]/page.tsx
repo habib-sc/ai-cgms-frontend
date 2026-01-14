@@ -1,0 +1,117 @@
+"use client";
+import { useMemo, useEffect } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import {
+  useContent,
+  useJobStatus,
+  contentKeys,
+} from "@/lib/api/queries/content";
+import { formatDateTime } from "@/lib/utils/datetime";
+import { GeneratedResult } from "@/app/dashboard/generate/components/generated-result";
+import { PendingResult } from "@/app/dashboard/generate/components/pending-result";
+import { StatusBadge } from "@/app/dashboard/content/components/status-badge";
+import { Card } from "@/components/ui/card";
+import { watchJob } from "@/lib/realtime/job-socket";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
+import { playNotifySound } from "@/lib/utils/notify";
+
+export default function ContentDetailPage() {
+  const params = useParams() as { id?: string };
+  const id = params?.id ?? "";
+  const { data: content, isLoading } = useContent(id);
+  const jobId = content?.jobId ?? "";
+  const { data: job } = useJobStatus(jobId);
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    if (!jobId) return;
+    const token =
+      (typeof window !== "undefined" &&
+        (window.localStorage.getItem("accessToken") ||
+          window.localStorage.getItem("access_token"))) ||
+      "";
+    const stop = watchJob(jobId, token, (payload) => {
+      qc.setQueryData(contentKeys.status(jobId), payload);
+      if (payload.status === "completed") {
+        toast.success("Content updated");
+        playNotifySound();
+        qc.invalidateQueries({ queryKey: contentKeys.detail(id) });
+        qc.invalidateQueries({ queryKey: contentKeys.all });
+      }
+    });
+    return stop;
+  }, [jobId, id, qc]);
+  const status: "pending" | "processing" | "queued" | "completed" | "failed" =
+    useMemo(() => {
+      if (job?.status === "failed") return "failed";
+      if (content?.contentError) return "failed";
+      if (job?.status === "completed") return "completed";
+      if (content?.status === "completed") return "completed";
+      if (content?.output || content?.generatedContent) return "completed";
+      if (job?.status === "processing") return "processing";
+      if (job?.status === "queued") return "queued";
+      return "pending";
+    }, [job, content]);
+
+  if (isLoading || !content) {
+    return (
+      <div className="space-y-6">
+        <div className="text-sm text-zinc-600 dark:text-zinc-400">Loading…</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="min-w-0">
+          <div className="truncate text-lg font-medium">
+            {content.title || "Untitled"}
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              {content.contentType}
+            </span>
+            <StatusBadge status={status} />
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+            Created {formatDateTime(content.createdAt)}
+          </div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">
+            Updated {formatDateTime(content.updatedAt)}
+          </div>
+        </div>
+      </div>
+
+      {status === "completed" ? (
+        <GeneratedResult output={content.output ?? content.generatedContent} />
+      ) : (
+        <PendingResult
+          expectedAt={undefined}
+          status={job?.status}
+          contentId={content.id ?? content._id}
+        />
+      )}
+
+      <Card>
+        <div className="text-sm font-medium">Prompt</div>
+        <div className="mt-2 whitespace-pre-wrap rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:bg-zinc-900 dark:border-zinc-800">
+          {content.prompt}
+        </div>
+      </Card>
+
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard/content"
+          className="text-xs text-zinc-600 hover:underline dark:text-zinc-400"
+        >
+          Back to My Content
+        </Link>
+      </div>
+    </div>
+  );
+}

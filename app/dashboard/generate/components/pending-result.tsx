@@ -1,6 +1,6 @@
 "use client";
 import { Card } from "../../../../components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, Hourglass, Clock } from "lucide-react";
 
 export function PendingResult({
   expectedAt,
@@ -8,7 +8,7 @@ export function PendingResult({
   contentId,
 }: {
   expectedAt?: string | null;
-  status?: "pending" | "running" | "failed" | "completed";
+  status?: "pending" | "processing" | "queued" | "running" | "failed" | "completed";
   contentId?: string | null;
 }) {
   const eta = expectedAt ? new Date(expectedAt).toLocaleString() : undefined;
@@ -16,8 +16,22 @@ export function PendingResult({
     <Card>
       <div className="mb-3 flex items-center justify-between">
         <div className="inline-flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <div className="text-sm font-medium">Pending Result</div>
+          {status === "queued" ? (
+            <Hourglass className="h-4 w-4" />
+          ) : status === "pending" ? (
+            <Clock className="h-4 w-4" />
+          ) : (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+          <div className="text-sm font-medium">
+            {status === "queued"
+              ? "Queued"
+              : status === "pending"
+              ? "Pending"
+              : status === "running" || status === "processing"
+              ? "Processing"
+              : "Pending Result"}
+          </div>
         </div>
         {contentId ? (
           <div className="text-xs text-zinc-600 dark:text-zinc-400">ID: {contentId}</div>
@@ -27,6 +41,10 @@ export function PendingResult({
         <div className="text-zinc-700 dark:text-zinc-300">
           {status === "failed"
             ? "Generation failed. Please try again."
+            : status === "queued"
+            ? "Job queued. Waiting for an available worker."
+            : status === "pending"
+            ? "Job is pending and will start shortly."
             : "Your content is being generated. It will appear here once ready."}
         </div>
         {eta ? (
@@ -36,4 +54,3 @@ export function PendingResult({
     </Card>
   );
 }
-

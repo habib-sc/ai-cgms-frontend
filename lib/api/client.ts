@@ -60,7 +60,7 @@ export interface Content {
   contentError?: string;
   jobId?: string;
   notes?: string;
-  status?: "pending" | "completed" | "failed";
+  status?: "pending" | "processing" | "queued" | "completed" | "failed";
   createdAt: string;
   updatedAt: string;
 }
@@ -72,7 +72,13 @@ export interface ContentListMeta {
 }
 export interface JobStatus {
   jobId: string;
-  status: "pending" | "running" | "completed" | "failed";
+  status:
+    | "pending"
+    | "processing"
+    | "queued"
+    | "running"
+    | "completed"
+    | "failed";
   contentId?: string;
   error?: string;
 }
@@ -128,7 +134,7 @@ export const api = {
     list: async (params?: {
       page?: number;
       limit?: number;
-      status?: "pending" | "completed" | "failed";
+      status?: "pending" | "processing" | "queued" | "completed" | "failed";
       contentType?: string;
       startDate?: string;
       endDate?: string;

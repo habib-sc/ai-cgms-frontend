@@ -12,26 +12,7 @@ import { api } from "../../../lib/api/client";
 import { watchJob } from "../../../lib/realtime/job-socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { contentKeys } from "../../../lib/api/queries/content";
-
-function playNotifySound() {
-  if (typeof window === "undefined") return;
-  const AC =
-    (window as unknown as { webkitAudioContext?: typeof AudioContext })
-      .webkitAudioContext ?? AudioContext;
-  const ctx = new AC();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = "sine";
-  osc.frequency.value = 880;
-  gain.gain.value = 0.08;
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start();
-  setTimeout(() => {
-    osc.stop();
-    ctx.close();
-  }, 180);
-}
+import { playNotifySound } from "../../../lib/utils/notify";
 // import Link from "next/link";
 import { GenerateBanner } from "./components/generate-banner";
 import { GenerateForm, type GenerateValues } from "./components/generate-form";
