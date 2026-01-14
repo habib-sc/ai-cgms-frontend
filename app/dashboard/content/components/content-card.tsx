@@ -49,9 +49,9 @@ export function ContentCard({
   };
   return (
     <Card>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="truncate text-md font-medium">
+          <div className="truncate text-sm sm:text-md font-medium">
             {content.title || "Untitled"}
           </div>
         </div>
@@ -59,7 +59,7 @@ export function ContentCard({
           {formatDateTime(content.createdAt)}
         </div>
       </div>
-      <div className="mt-1 flex items-center gap-2">
+      <div className="mt-1 flex flex-wrap items-center gap-2">
         <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
           {typeLabel}
         </span>
@@ -70,16 +70,15 @@ export function ContentCard({
           {preview}
         </div>
       ) : null}
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href={`/dashboard/content/${content.id ?? content._id}`}
-          className="inline-flex items-center gap-1 text-md text-blue-600 hover:underline dark:text-blue-400"
+          className="inline-flex items-center gap-1 text-sm sm:text-md text-blue-600 hover:underline dark:text-blue-400"
         >
           <span>Open</span>
           <ChevronRight className="h-3 w-3" />
         </Link>
-        <div>
-          {" "}
+        <div className="flex flex-wrap items-center gap-2">
           {content.tags?.slice(0, 3).map((t, index) => (
             <span
               key={index}

@@ -10,11 +10,15 @@ const items = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar({ className = "" }: { className?: string }) {
+export function Sidebar({ className = "", variant = "desktop", onNavigate }: { className?: string; variant?: "desktop" | "mobile"; onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
     <aside
-      className={`sticky top-14 h-[calc(100vh-56px)] w-64 flex flex-col border-r border-zinc-200 bg-white/80 backdrop-blur dark:bg-black/60 dark:border-zinc-800 ${className}`}
+      className={`${
+        variant === "mobile"
+          ? "fixed top-14 left-0 bottom-0 z-50 h-[calc(100vh-56px)] w-64 flex flex-col border-r border-zinc-200 bg-white/95 backdrop-blur dark:bg-black/80 dark:border-zinc-800"
+          : "sticky top-14 h-[calc(100vh-56px)] w-64 flex flex-col border-r border-zinc-200 bg-white/80 backdrop-blur dark:bg-black/60 dark:border-zinc-800"
+      } ${className}`}
     >
       {/* <s */}
       <nav className="flex-1 px-2 py-2">
@@ -30,6 +34,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
             <Link
               key={href}
               href={href}
+              onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={`group relative flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${
                 active

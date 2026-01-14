@@ -76,7 +76,7 @@ export default function ContentDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="truncate text-lg font-medium">
             {content.title || "Untitled"}
@@ -106,13 +106,9 @@ export default function ContentDetailPage() {
             </Button>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-zinc-500 dark:text-zinc-400">
-            Created {formatDateTime(content.createdAt)}
-          </div>
-          <div className="text-xs text-zinc-500 dark:text-zinc-400">
-            Updated {formatDateTime(content.updatedAt)}
-          </div>
+        <div className="text-right sm:text-right text-xs sm:text-xs text-zinc-500 dark:text-zinc-400">
+          <div>Created {formatDateTime(content.createdAt)}</div>
+          <div>Updated {formatDateTime(content.updatedAt)}</div>
         </div>
       </div>
 

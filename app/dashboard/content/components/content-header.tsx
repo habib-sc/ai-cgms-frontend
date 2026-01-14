@@ -15,14 +15,14 @@ export function ContentHeader({
   onTypeChange: (v: string | undefined) => void;
 }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h1 className="text-xl font-semibold">My Content</h1>
-      <div className="flex items-center gap-2">
+      <div className="flex w-full items-center gap-2 sm:w-auto">
         <Input
           placeholder="Search…"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-56"
+          className="w-full sm:w-56"
         />
         <Select
           defaultValue={type}
@@ -39,4 +39,3 @@ export function ContentHeader({
     </div>
   );
 }
-
