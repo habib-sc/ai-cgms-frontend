@@ -5,18 +5,17 @@ import { useAuthStore } from "../../lib/stores/auth";
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { initialized, fetchSession } = useAuthStore();
+  const { initialized, isAuthenticated, fetchSession } = useAuthStore();
 
   useEffect(() => {
-    const hasToken =
-      typeof window !== "undefined" &&
-      !!window.localStorage.getItem("accessToken");
-    if (!hasToken) {
-      router.replace("/login");
+    if (!initialized) {
+      void fetchSession();
       return;
     }
-    if (!initialized) fetchSession();
-  }, [initialized, fetchSession, router]);
+    if (!isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [initialized, isAuthenticated, fetchSession, router]);
 
   return <>{children}</>;
 }
