@@ -40,20 +40,19 @@ export default function Header() {
               className="inline-flex items-center gap-2 text-sm hover:underline"
             >
               <UserCircle className="h-5 w-5" />
-              <span className="hidden sm:inline">
-                {user?.name ?? "Profile"}
-              </span>
+              <span>{user?.name ?? "Profile"}</span>
             </Link>
             <button
               type="button"
+              aria-label="Logout"
               onClick={() => {
                 clear();
                 router.replace("/login");
               }}
-              className="inline-flex items-center gap-2 text-sm text-red-600 hover:underline dark:text-red-400"
+              className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-700 hover:underline dark:text-red-400 dark:hover:text-red-300"
             >
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
+              <span>Logout</span>
             </button>
           </>
         ) : (

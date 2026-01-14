@@ -32,11 +32,13 @@ export default function DashboardPage() {
           title="Total Content"
           value={isLoading ? "…" : total}
           icon={<BarChart3 className="h-6 w-6" />}
+          className="border-violet-200/70"
         />
         <StatCard
           title="Most Common Type"
           value={isLoading ? "…" : mostCommon(byType)}
           icon={<FileText className="h-6 w-6" />}
+          className="border-cyan-200/70"
         />
         <StatCard
           title="Quick Generate"
@@ -46,6 +48,7 @@ export default function DashboardPage() {
             </span>
           }
           icon={<Sparkles className="h-6 w-6" />}
+          className="border-amber-200/70"
         />
       </div>
 
