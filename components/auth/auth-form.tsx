@@ -62,7 +62,7 @@ export function AuthForm({ mode, className = "" }: AuthFormProps) {
             {...formRegister("name", { required: mode === "register" })}
           />
           {errors.name && (
-            <span className="text-xs text-red-600">Name is required</span>
+            <span className="text-sm text-red-600">Name is required</span>
           )}
         </div>
       )}
@@ -79,7 +79,7 @@ export function AuthForm({ mode, className = "" }: AuthFormProps) {
           })}
         />
         {errors.email && (
-          <span className="text-xs text-red-600">Enter a valid email</span>
+          <span className="text-sm text-red-600">Enter a valid email</span>
         )}
       </div>
 
@@ -106,7 +106,7 @@ export function AuthForm({ mode, className = "" }: AuthFormProps) {
           </button>
         </div>
         {errors.password && (
-          <span className="text-xs text-red-600">Min 6 characters</span>
+          <span className="text-sm text-red-600">Min 6 characters</span>
         )}
       </div>
 

@@ -21,14 +21,14 @@ export default function Header() {
   return (
     <>
       <header className="fixed left-0 right-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-zinc-200 bg-white/80 px-6 backdrop-blur supports--webkit-backdrop-filter:bg-white/70 dark:bg-black/60 dark:border-zinc-800">
-        <Link href="/" className="text-lg font-semibold">
-          AI Content
+        <Link href="/" className="text-xl font-semibold">
+          AI Content Generator
         </Link>
         <nav className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-sm hover:underline">
+          <Link href="/dashboard" className="text-md hover:underline">
             Dashboard
           </Link>
-          <Link href="/dashboard/content" className="text-sm hover:underline">
+          <Link href="/dashboard/content" className="text-md hover:underline">
             My Content
           </Link>
         </nav>
@@ -38,7 +38,7 @@ export default function Header() {
               <Link
                 href="/dashboard"
                 aria-label="Profile"
-                className="inline-flex items-center gap-2 text-sm hover:underline"
+                className="inline-flex items-center gap-2 text-md hover:underline"
               >
                 <UserCircle className="h-5 w-5" />
                 <span>{user?.name ?? "Profile"}</span>
@@ -50,7 +50,7 @@ export default function Header() {
                   clear();
                   router.replace("/login");
                 }}
-                className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-700 hover:underline dark:text-red-400 dark:hover:text-red-300"
+                className="inline-flex items-center gap-2 text-md text-red-600 hover:text-red-700 hover:underline dark:text-red-400 dark:hover:text-red-300"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>

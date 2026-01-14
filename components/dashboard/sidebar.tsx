@@ -16,9 +16,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
     <aside
       className={`sticky top-14 h-[calc(100vh-56px)] w-64 flex flex-col border-r border-zinc-200 bg-white/80 backdrop-blur dark:bg-black/60 dark:border-zinc-800 ${className}`}
     >
-      <div className="px-4 py-3">
-        <div className="text-sm font-semibold">Dashboard</div>
-      </div>
+      {/* <s */}
       <nav className="flex-1 px-2 py-2">
         {items.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
@@ -26,7 +24,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-md ${
                 active
                   ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
                   : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
