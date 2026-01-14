@@ -2,7 +2,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
 type Variant = "default" | "secondary" | "destructive" | "outline";
-type Size = "sm" | "md" | "lg";
+type Size = "xs" | "sm" | "md" | "lg";
 
 const variantClasses: Record<Variant, string> = {
   default:
@@ -14,6 +14,7 @@ const variantClasses: Record<Variant, string> = {
     "border border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800",
 };
 const sizeClasses: Record<Size, string> = {
+  xs: "h-7 px-2 text-xs",
   sm: "h-9 px-3 text-sm",
   md: "h-10 px-4 text-sm",
   lg: "h-11 px-6 text-base",

@@ -12,6 +12,9 @@ import { formatDateTime } from "../../../../lib/utils/datetime";
 import { ChevronRight } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 import { toast } from "react-hot-toast";
+import { Pencil, Trash2 } from "lucide-react";
+import { useDeleteContent } from "@/lib/api/queries/content";
+import { ConfirmDeleteModal } from "./confirm-delete-modal";
 
 export function ContentCard({
   content,
@@ -21,6 +24,9 @@ export function ContentCard({
   typeLabel: string;
 }) {
   const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const { mutateAsync: deleteAsync, isPending: isDeleting } =
+    useDeleteContent();
   const status: "pending" | "processing" | "queued" | "completed" | "failed" =
     content.status ??
     (content.contentError
@@ -29,6 +35,18 @@ export function ContentCard({
       ? "completed"
       : "pending");
   const preview = content.generatedContent || content.output || content.prompt;
+  const id = content.id ?? content._id ?? "";
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteAsync(id);
+      toast.success("Content deleted");
+      setShowDelete(false);
+    } catch (err) {
+      const msg = (err as Error)?.message ?? "Failed to delete";
+      toast.error(msg);
+    }
+  };
   return (
     <Card>
       <div className="flex items-center justify-between">
@@ -60,7 +78,8 @@ export function ContentCard({
           <span>Open</span>
           <ChevronRight className="h-3 w-3" />
         </Link>
-        <div className="flex items-center gap-2">
+        <div>
+          {" "}
           {content.tags?.slice(0, 3).map((t, index) => (
             <span
               key={index}
@@ -69,8 +88,25 @@ export function ContentCard({
               {t}
             </span>
           ))}
-          <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
-            Edit
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="xs"
+            aria-label="Edit"
+            onClick={() => setShowEdit(true)}
+            title="Edit"
+          >
+            <Pencil className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="destructive"
+            size="xs"
+            aria-label="Delete"
+            onClick={() => setShowDelete(true)}
+            title="Delete"
+          >
+            <Trash2 className="h-3 w-3" />
           </Button>
         </div>
       </div>
@@ -103,6 +139,13 @@ export function ContentCard({
           </div>
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={showDelete}
+        onClose={() => setShowDelete(false)}
+        onConfirm={handleDelete}
+        loading={isDeleting}
+      />
     </Card>
   );
 }

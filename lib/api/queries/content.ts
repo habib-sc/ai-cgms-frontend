@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, type Provider } from "../client";
+import { api, type Provider, type Content, type ContentListMeta } from "../client";
 
 export const contentKeys = {
   all: ["content"] as const,
@@ -83,7 +83,25 @@ export function useDeleteContent() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (contentId: string) => api.content.delete(contentId),
-    onSuccess: () => {
+    onMutate: async (contentId: string) => {
+      await qc.cancelQueries({ queryKey: contentKeys.all });
+      const listPairs = qc.getQueriesData<{ items: Content[]; meta?: ContentListMeta | undefined }>({
+        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === "content" && q.queryKey[1] === "list",
+      });
+      listPairs.forEach(([key, data]) => {
+        if (!data) return;
+        const nextItems = (data.items ?? []).filter((c) => (c.id ?? c._id) !== contentId);
+        qc.setQueryData(key, { ...data, items: nextItems });
+      });
+      qc.removeQueries({ queryKey: contentKeys.detail(contentId) });
+      return { listPairs };
+    },
+    onError: (_err, _contentId, ctx) => {
+      ctx?.listPairs?.forEach(([key, data]) => {
+        qc.setQueryData(key, data);
+      });
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: contentKeys.all });
     },
   });

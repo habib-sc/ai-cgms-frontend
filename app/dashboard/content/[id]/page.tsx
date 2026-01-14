@@ -18,6 +18,10 @@ import { watchJob } from "@/lib/realtime/job-socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { playNotifySound } from "@/lib/utils/notify";
+import { Pencil, Trash2 } from "lucide-react";
+import { useDeleteContent } from "@/lib/api/queries/content";
+import { useRouter } from "next/navigation";
+import { ConfirmDeleteModal } from "@/app/dashboard/content/components/confirm-delete-modal";
 
 export default function ContentDetailPage() {
   const params = useParams() as { id?: string };
@@ -27,6 +31,10 @@ export default function ContentDetailPage() {
   const { data: job } = useJobStatus(jobId);
   const qc = useQueryClient();
   const [showEdit, setShowEdit] = useState(false);
+  const { mutateAsync: deleteAsync, isPending: isDeleting } =
+    useDeleteContent();
+  const router = useRouter();
+  const [showDelete, setShowDelete] = useState(false);
 
   useEffect(() => {
     if (!jobId) return;
@@ -80,10 +88,21 @@ export default function ContentDetailPage() {
             <StatusBadge status={status} />
             <Button
               variant="outline"
-              size="sm"
+              size="xs"
+              aria-label="Edit"
               onClick={() => setShowEdit(true)}
+              title="Edit"
             >
-              Edit
+              <Pencil className="h-3 w-3" />
+            </Button>
+            <Button
+              variant="destructive"
+              size="xs"
+              aria-label="Delete"
+              onClick={() => setShowDelete(true)}
+              title="Delete"
+            >
+              <Trash2 className="h-3 w-3" />
             </Button>
           </div>
         </div>
@@ -114,6 +133,22 @@ export default function ContentDetailPage() {
         defaultTitle={content.title}
         defaultTags={content.tags}
         defaultNotes={content.notes}
+      />
+
+      <ConfirmDeleteModal
+        open={showDelete}
+        onClose={() => setShowDelete(false)}
+        onConfirm={async () => {
+          try {
+            await deleteAsync(id);
+            toast.success("Content deleted");
+            router.push("/dashboard/content");
+          } catch (err) {
+            const msg = (err as Error)?.message ?? "Failed to delete";
+            toast.error(msg);
+          }
+        }}
+        loading={isDeleting}
       />
 
       <Card>
