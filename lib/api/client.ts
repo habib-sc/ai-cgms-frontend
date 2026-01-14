@@ -40,7 +40,6 @@ async function unwrapData<T>(
   return res.data.data;
 }
 
-
 // Minimal types (expand later)
 export interface User {
   id: string;
@@ -57,10 +56,19 @@ export interface Content {
   tags: string[];
   prompt: string;
   output?: string;
+  generatedContent?: string;
+  contentError?: string;
+  jobId?: string;
   notes?: string;
   status?: "pending" | "completed" | "failed";
   createdAt: string;
   updatedAt: string;
+}
+export interface ContentListMeta {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
 }
 export interface JobStatus {
   jobId: string;
@@ -117,7 +125,7 @@ export const api = {
     get: (contentId: string) =>
       unwrapData<Content>(http.get(`/v1/content/${contentId}`)),
     // GET /v1/content: page, limit, status, contentType, startDate, endDate, search
-    list: (params?: {
+    list: async (params?: {
       page?: number;
       limit?: number;
       status?: "pending" | "completed" | "failed";
@@ -125,7 +133,7 @@ export const api = {
       startDate?: string;
       endDate?: string;
       search?: string;
-    }) => {
+    }): Promise<{ items: Content[]; meta?: ContentListMeta }> => {
       const qs = new URLSearchParams();
       if (params?.page) qs.set("page", String(params.page));
       if (params?.limit) qs.set("limit", String(params.limit));
@@ -135,7 +143,14 @@ export const api = {
       if (params?.endDate) qs.set("endDate", params.endDate);
       if (params?.search) qs.set("search", params.search);
       const suffix = qs.toString() ? `?${qs.toString()}` : "";
-      return unwrapData<Content[]>(http.get(`/v1/content${suffix}`));
+      const body = await unwrap<ApiResponse<unknown>>(
+        http.get(`/v1/content${suffix}`)
+      );
+      const maybe = body as { data?: unknown; meta?: ContentListMeta };
+      const arr = Array.isArray(maybe.data)
+        ? (maybe.data as Content[])
+        : (body.data as Content[]);
+      return { items: arr ?? [], meta: maybe.meta };
     },
     // PATCH /v1/content/:contentId (title, tags, notes)
     patch: (
