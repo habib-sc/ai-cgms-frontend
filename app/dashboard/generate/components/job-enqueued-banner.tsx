@@ -18,7 +18,7 @@ export function JobEnqueuedBanner({
 }) {
   return (
     <div className="rounded-xl border border-emerald-200/70 bg-emerald-50 px-6 py-5 dark:bg-emerald-900/30">
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col md:flex-row items-start justify-between">
         <div>
           <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
             Job enqueued successfully
@@ -43,7 +43,7 @@ export function JobEnqueuedBanner({
             </div>
           )}
         </div>
-        <div className="text-xs">
+        <div className="text-xs mt-5 md:mt-0">
           <Link
             href="/dashboard/content"
             className="text-blue-600 hover:underline dark:text-blue-400"

@@ -81,32 +81,34 @@ export default function ContentDetailPage() {
           <div className="truncate text-lg font-medium">
             {content.title || "Untitled"}
           </div>
-          <div className="mt-1 flex items-center gap-2">
+          <div className="mt-1 flex items-center justify-between gap-2">
             <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
               {content.contentType}
             </span>
             <StatusBadge status={status} />
-            <Button
-              variant="outline"
-              size="xs"
-              aria-label="Edit"
-              onClick={() => setShowEdit(true)}
-              title="Edit"
-            >
-              <Pencil className="h-3 w-3" />
-            </Button>
-            <Button
-              variant="destructive"
-              size="xs"
-              aria-label="Delete"
-              onClick={() => setShowDelete(true)}
-              title="Delete"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="xs"
+                aria-label="Edit"
+                onClick={() => setShowEdit(true)}
+                title="Edit"
+              >
+                <Pencil className="h-3 w-3" />
+              </Button>
+              <Button
+                variant="destructive"
+                size="xs"
+                aria-label="Delete"
+                onClick={() => setShowDelete(true)}
+                title="Delete"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="text-right sm:text-right text-xs sm:text-xs text-zinc-500 dark:text-zinc-400">
+        <div className="text-center sm:text-right text-xs sm:text-xs text-zinc-500 dark:text-zinc-400">
           <div>Created {formatDateTime(content.createdAt)}</div>
           <div>Updated {formatDateTime(content.updatedAt)}</div>
         </div>
