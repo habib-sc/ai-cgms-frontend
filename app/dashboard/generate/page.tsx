@@ -9,6 +9,29 @@ import {
   useContent,
 } from "../../../lib/api/queries/content";
 import { api } from "../../../lib/api/client";
+import { watchJob } from "../../../lib/realtime/job-socket";
+import { useQueryClient } from "@tanstack/react-query";
+import { contentKeys } from "../../../lib/api/queries/content";
+
+function playNotifySound() {
+  if (typeof window === "undefined") return;
+  const AC =
+    (window as unknown as { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext ?? AudioContext;
+  const ctx = new AC();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "sine";
+  osc.frequency.value = 880;
+  gain.gain.value = 0.08;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  setTimeout(() => {
+    osc.stop();
+    ctx.close();
+  }, 180);
+}
 // import Link from "next/link";
 import { GenerateBanner } from "./components/generate-banner";
 import { GenerateForm, type GenerateValues } from "./components/generate-form";
@@ -23,6 +46,7 @@ export default function GeneratePage() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [contentId, setContentId] = useState<string | null>(null);
   const [expectedAt, setExpectedAt] = useState<string | null>(null);
+  const qc = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -49,6 +73,25 @@ export default function GeneratePage() {
     contentId ??
     (status?.status === "completed" ? status.contentId ?? null : null);
   const { data: content } = useContent(resolvedContentId ?? "");
+
+  useEffect(() => {
+    if (!jobId) return;
+    const token =
+      (typeof window !== "undefined" &&
+        (window.localStorage.getItem("accessToken") ||
+          window.localStorage.getItem("access_token"))) ||
+      "";
+    const stop = watchJob(jobId, token, (payload) => {
+      qc.setQueryData(contentKeys.status(jobId), payload);
+      if (payload.status === "completed" && payload.contentId) {
+        setContentId((prev) => prev ?? payload.contentId ?? null);
+        toast.success("Content generation completed");
+        playNotifySound();
+        qc.invalidateQueries({ queryKey: contentKeys.all });
+      }
+    });
+    return stop;
+  }, [jobId, qc]);
 
   const [pendingTitle, setPendingTitle] = useState<string>("");
 
