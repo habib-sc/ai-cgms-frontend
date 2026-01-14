@@ -5,7 +5,7 @@ import { useAuthStore } from "../../lib/stores/auth";
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, fetchSession } = useAuthStore();
+  const { initialized, fetchSession } = useAuthStore();
 
   useEffect(() => {
     const hasToken =
@@ -15,8 +15,8 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
       router.replace("/login");
       return;
     }
-    if (!isAuthenticated && !isLoading) fetchSession();
-  }, [isAuthenticated, isLoading, fetchSession, router]);
+    if (!initialized) fetchSession();
+  }, [initialized, fetchSession, router]);
 
   return <>{children}</>;
 }

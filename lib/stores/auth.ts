@@ -8,6 +8,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  initialized: boolean;
   error?: string;
   fetchSession: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -15,21 +16,23 @@ interface AuthState {
   clear: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
+  initialized: false,
   error: undefined,
 
   // GET /v1/auth/me
   fetchSession: async () => {
+    if (get().initialized) return;
     set({ isLoading: true, error: undefined });
     try {
       const { user } = await api.auth.me();
-      set({ user: user ?? null, isAuthenticated: !!user, isLoading: false });
+      set({ user: user ?? null, isAuthenticated: !!user, isLoading: false, initialized: true });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Session error";
-      set({ error: msg, isLoading: false });
+      set({ error: msg, isLoading: false, initialized: true });
     }
   },
 
@@ -46,7 +49,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         window.localStorage.removeItem("access_token");
         window.localStorage.removeItem("refresh_token");
       }
-      set({ user, isAuthenticated: true, isLoading: false });
+      set({ user, isAuthenticated: true, isLoading: false, initialized: true });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Login error";
       set({ error: msg, isLoading: false });
@@ -66,7 +69,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         window.localStorage.removeItem("access_token");
         window.localStorage.removeItem("refresh_token");
       }
-      set({ user, isAuthenticated: true, isLoading: false });
+      set({ user, isAuthenticated: true, isLoading: false, initialized: true });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Register error";
       set({ error: msg, isLoading: false });
@@ -79,6 +82,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       window.localStorage.removeItem("accessToken");
       window.localStorage.removeItem("refreshToken");
     }
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false, initialized: false });
   },
 }));

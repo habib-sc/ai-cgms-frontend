@@ -67,6 +67,7 @@ export interface Content {
   prompt: string;
   output?: string;
   notes?: string;
+  status?: "pending" | "completed" | "failed";
   createdAt: string;
   updatedAt: string;
 }
@@ -108,7 +109,11 @@ export const api = {
       model?: string;
       provider?: Provider;
     }) =>
-      unwrapData<{ jobId: string }>(http.post("/v1/content/generate", body)),
+      unwrapData<{
+        jobId: string;
+        expectedCompletion?: string;
+        contentId?: string;
+      }>(http.post("/v1/content/generate", body)),
     // POST /v1/content/:contentId/regenerate (optional provider/model)
     regenerate: (
       contentId: string,
