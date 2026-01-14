@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { CONTENT_TYPES } from "../../../lib/constants/content-types";
@@ -8,6 +8,7 @@ import {
   useJobStatus,
   useContent,
 } from "../../../lib/api/queries/content";
+import { api } from "../../../lib/api/client";
 // import Link from "next/link";
 import { GenerateBanner } from "./components/generate-banner";
 import { GenerateForm, type GenerateValues } from "./components/generate-form";
@@ -26,6 +27,7 @@ export default function GeneratePage() {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<GenerateValues>({
     defaultValues: {
@@ -33,6 +35,7 @@ export default function GeneratePage() {
       prompt: "",
       provider: "openai",
       model: "gpt-5-nano",
+      title: "",
     },
   });
 
@@ -46,6 +49,21 @@ export default function GeneratePage() {
     contentId ??
     (status?.status === "completed" ? status.contentId ?? null : null);
   const { data: content } = useContent(resolvedContentId ?? "");
+
+  const [pendingTitle, setPendingTitle] = useState<string>("");
+
+  useEffect(() => {
+    const tryPatchTitle = async () => {
+      if (!pendingTitle || !resolvedContentId) return;
+      try {
+        await api.content.patch(resolvedContentId, { title: pendingTitle });
+        setPendingTitle("");
+      } catch {
+        // swallow; can retry later if needed
+      }
+    };
+    void tryPatchTitle();
+  }, [pendingTitle, resolvedContentId]);
 
   const onSubmit = async (values: GenerateValues) => {
     setJobId(null);
@@ -68,6 +86,19 @@ export default function GeneratePage() {
       setJobId(result.jobId);
       if (result.contentId) setContentId(result.contentId);
       if (result.expectedCompletion) setExpectedAt(result.expectedCompletion);
+      const t = (values.title ?? "").trim();
+      if (t) {
+        if (result.contentId) {
+          try {
+            await api.content.patch(result.contentId, { title: t });
+          } catch {
+            setPendingTitle(t);
+          }
+        } else {
+          setPendingTitle(t);
+        }
+      }
+      reset({ prompt: "", title: "" });
     } catch {
       toast.error("Failed to start generation");
     }

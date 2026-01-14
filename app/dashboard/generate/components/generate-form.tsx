@@ -14,6 +14,7 @@ export interface GenerateValues {
   prompt: string;
   provider?: Provider;
   model?: string;
+  title?: string;
 }
 
 export function GenerateForm({
@@ -81,7 +82,7 @@ export function GenerateForm({
           </div>
           <div className="space-y-2">
             <Label>Title (optional)</Label>
-            <Input placeholder="Give it a helpful title" />
+            <Input placeholder="Give it a helpful title" {...register("title")} />
           </div>
         </div>
 
