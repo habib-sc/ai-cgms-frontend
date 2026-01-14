@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -12,6 +12,8 @@ import { GeneratedResult } from "@/app/dashboard/generate/components/generated-r
 import { PendingResult } from "@/app/dashboard/generate/components/pending-result";
 import { StatusBadge } from "@/app/dashboard/content/components/status-badge";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ContentEditModal } from "@/app/dashboard/content/components/content-edit-modal";
 import { watchJob } from "@/lib/realtime/job-socket";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -24,6 +26,7 @@ export default function ContentDetailPage() {
   const jobId = content?.jobId ?? "";
   const { data: job } = useJobStatus(jobId);
   const qc = useQueryClient();
+  const [showEdit, setShowEdit] = useState(false);
 
   useEffect(() => {
     if (!jobId) return;
@@ -75,6 +78,13 @@ export default function ContentDetailPage() {
               {content.contentType}
             </span>
             <StatusBadge status={status} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowEdit(true)}
+            >
+              Edit
+            </Button>
           </div>
         </div>
         <div className="text-right">
@@ -97,6 +107,15 @@ export default function ContentDetailPage() {
         />
       )}
 
+      <ContentEditModal
+        open={showEdit}
+        onClose={() => setShowEdit(false)}
+        contentId={id}
+        defaultTitle={content.title}
+        defaultTags={content.tags}
+        defaultNotes={content.notes}
+      />
+
       <Card>
         <div className="text-sm font-medium">Prompt</div>
         <div className="mt-2 whitespace-pre-wrap rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:bg-zinc-900 dark:border-zinc-800">
@@ -115,3 +134,5 @@ export default function ContentDetailPage() {
     </div>
   );
 }
+
+// moved ContentMetaForm into components/content-meta-form.tsx and modal into components/content-edit-modal.tsx
