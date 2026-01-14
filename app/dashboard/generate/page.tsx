@@ -27,6 +27,7 @@ export default function GeneratePage() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [contentId, setContentId] = useState<string | null>(null);
   const [expectedAt, setExpectedAt] = useState<string | null>(null);
+  const [estimatedDelayMs, setEstimatedDelayMs] = useState<number | null>(null);
   const qc = useQueryClient();
   const {
     register,
@@ -93,6 +94,7 @@ export default function GeneratePage() {
     setJobId(null);
     setContentId(null);
     setExpectedAt(null);
+    setEstimatedDelayMs(null);
     try {
       const result = await toast.promise(
         mutateAsync({
@@ -110,6 +112,7 @@ export default function GeneratePage() {
       setJobId(result.jobId);
       if (result.contentId) setContentId(result.contentId);
       if (result.expectedCompletion) setExpectedAt(result.expectedCompletion);
+      if (typeof result.expectedDelayMs === "number") setEstimatedDelayMs(result.expectedDelayMs);
       const t = (values.title ?? "").trim();
       if (t) {
         if (result.contentId) {
@@ -161,6 +164,7 @@ export default function GeneratePage() {
           jobId={jobId}
           expectedAt={expectedAt}
           contentId={resolvedContentId}
+          estimatedDelayMs={estimatedDelayMs}
         />
       )}
 
@@ -175,6 +179,7 @@ export default function GeneratePage() {
           expectedAt={expectedAt}
           status={status?.status}
           contentId={resolvedContentId}
+          estimatedDelayMs={estimatedDelayMs}
         />
       ) : null}
     </div>

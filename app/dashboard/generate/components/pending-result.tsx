@@ -1,15 +1,24 @@
 "use client";
 import { Card } from "../../../../components/ui/card";
+import { formatMsToMinSec } from "../../../../lib/utils/datetime";
 import { Loader2, Hourglass, Clock } from "lucide-react";
 
 export function PendingResult({
   expectedAt,
   status,
   contentId,
+  estimatedDelayMs,
 }: {
   expectedAt?: string | null;
-  status?: "pending" | "processing" | "queued" | "running" | "failed" | "completed";
+  status?:
+    | "pending"
+    | "processing"
+    | "queued"
+    | "running"
+    | "failed"
+    | "completed";
   contentId?: string | null;
+  estimatedDelayMs?: number | null;
 }) {
   const eta = expectedAt ? new Date(expectedAt).toLocaleString() : undefined;
   return (
@@ -34,7 +43,9 @@ export function PendingResult({
           </div>
         </div>
         {contentId ? (
-          <div className="text-xs text-zinc-600 dark:text-zinc-400">ID: {contentId}</div>
+          <div className="text-xs text-zinc-600 dark:text-zinc-400">
+            ID: {contentId}
+          </div>
         ) : null}
       </div>
       <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm dark:bg-zinc-900 dark:border-zinc-800">
@@ -48,7 +59,14 @@ export function PendingResult({
             : "Your content is being generated. It will appear here once ready."}
         </div>
         {eta ? (
-          <div className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">ETA: {eta}</div>
+          <div className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+            ETA: {eta}
+          </div>
+        ) : null}
+        {typeof estimatedDelayMs === "number" && estimatedDelayMs > 0 ? (
+          <div className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
+            Estimated delay: {formatMsToMinSec(estimatedDelayMs)}
+          </div>
         ) : null}
       </div>
     </Card>

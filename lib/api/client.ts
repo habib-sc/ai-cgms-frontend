@@ -116,6 +116,7 @@ export const api = {
       unwrapData<{
         jobId: string;
         expectedCompletion?: string;
+        expectedDelayMs?: number;
         contentId?: string;
       }>(http.post("/v1/content/generate", body)),
     // POST /v1/content/:contentId/regenerate (optional provider/model)
