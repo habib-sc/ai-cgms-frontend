@@ -13,12 +13,11 @@ export default function Header() {
     useAuthStore();
   const router = useRouter();
   useEffect(() => {
-    const tokenPresent =
-      typeof window !== "undefined" &&
-      !!window.localStorage.getItem("accessToken");
-    if (tokenPresent && !initialized) fetchSession();
+    if (!initialized) fetchSession();
   }, [initialized, fetchSession]);
   const isUserLoggedIn = isAuthenticated;
+
+  console.log("isAuthenticated", isAuthenticated);
   return (
     <>
       <header className="fixed left-0 right-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-zinc-200 bg-white/80 px-6 backdrop-blur supports--webkit-backdrop-filter:bg-white/70 dark:bg-black/60 dark:border-zinc-800">

@@ -33,17 +33,6 @@ async function unwrap<T>(p: Promise<AxiosResponse<T>>): Promise<T> {
   return res.data;
 }
 
-async function unwrapMaybeEnvelope<T>(
-  p: Promise<AxiosResponse<unknown>>
-): Promise<T> {
-  const res = await p;
-  const payload = res.data as { data?: unknown } | unknown;
-  if (payload && typeof payload === "object" && "data" in payload) {
-    return (payload as { data: T }).data;
-  }
-  return payload as T;
-}
-
 async function unwrapData<T>(
   p: Promise<AxiosResponse<ApiResponse<T>>>
 ): Promise<T> {
@@ -51,11 +40,13 @@ async function unwrapData<T>(
   return res.data.data;
 }
 
+
 // Minimal types (expand later)
 export interface User {
   id: string;
   name: string;
   email: string;
+  role?: string;
 }
 export interface Content {
   id: string;
@@ -98,8 +89,7 @@ export const api = {
       unwrap<ApiResponse<AuthData>>(http.post("/v1/auth/register", body)),
     login: (body: { email: string; password: string }) =>
       unwrap<ApiResponse<AuthData>>(http.post("/v1/auth/login", body)),
-    me: () =>
-      unwrapMaybeEnvelope<{ user: User | null }>(http.get("/v1/auth/me")),
+    me: () => unwrapData<User | null>(http.get("/v1/auth/me")),
   },
   content: {
     // POST /v1/content/generate (expects prompt + contentType)

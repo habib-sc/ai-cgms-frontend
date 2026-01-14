@@ -28,8 +28,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (get().initialized) return;
     set({ isLoading: true, error: undefined });
     try {
-      const { user } = await api.auth.me();
-      set({ user: user ?? null, isAuthenticated: !!user, isLoading: false, initialized: true });
+      const me = await api.auth.me();
+      const user = me ?? null;
+      const userAuth = !!user;
+      set({
+        user,
+        isAuthenticated: userAuth,
+        isLoading: false,
+        initialized: true,
+      });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Session error";
       set({ error: msg, isLoading: false, initialized: true });
