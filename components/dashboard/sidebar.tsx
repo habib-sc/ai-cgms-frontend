@@ -19,18 +19,25 @@ export function Sidebar({ className = "" }: { className?: string }) {
       {/* <s */}
       <nav className="flex-1 px-2 py-2">
         {items.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
+          const active =
+            href === "/dashboard"
+              ? pathname === href
+              : pathname.startsWith(href);
+          const iconCls = active
+            ? "h-4 w-4 text-violet-600 dark:text-violet-400"
+            : "h-4 w-4 opacity-70";
           return (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2 rounded-md px-3 py-2 text-md ${
+              aria-current={active ? "page" : undefined}
+              className={`group relative flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors ${
                 active
-                  ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  ? " bg-zinc-100 text-zinc-900 dark:border-violet-500 dark:bg-zinc-800 dark:text-white font-medium"
+                  : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className={iconCls} />
               <span>{label}</span>
             </Link>
           );
